@@ -1,0 +1,24 @@
+{
+  "name": "aws-lambda-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "handler.js",
+  "scripts": {
+    "install:dynamodb-local": "sls dynamodb install",
+    "start:dynamodb-local": "sls dynamodb start",
+    "dev": "DYNAMO_ENDPOINT=http://localhost:8000 dynamodb-admin & sls offline start",
+    "dev2": "sls offline start",
+    "invoke": "sls invoke local -f hello",
+    "deploy": "sls deploy --stage dev --verbose"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "serverless-dynamodb-local": "^0.2.39",
+    "serverless-offline": "^6.8.0"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.834.0"
+  }
+}

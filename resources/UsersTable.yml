@@ -1,0 +1,13 @@
+UsersTable:
+  Type: AWS::DynamoDB::Table
+  Properties:
+    TableName: ${self:custom.DB.prefix}-UsersTable-${self:provider.stage}
+    BillingMode: PAY_PER_REQUEST
+
+    AttributeDefinitions:
+      - AttributeName: email
+        AttributeType: S
+
+    KeySchema:
+      - AttributeName: email
+        KeyType: HASH
