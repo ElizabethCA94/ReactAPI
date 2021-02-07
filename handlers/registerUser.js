@@ -45,10 +45,7 @@ module.exports.registerUser = async (event, context, callback) => {
 
   const response = {
     statusCode: 200,
-    body: JSON.stringify({
-      message: "oh yeah",
-      ...data,
-    }),
+    body: JSON.stringify(data),
   };
 
   return callback(null, response);
