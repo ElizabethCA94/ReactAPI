@@ -8,6 +8,8 @@ provider:
   stage: dev
   region: us-east-1
   profile: deploy-aws
+  httpApi:
+    cors: true
   environment:
     USERS_TABLE_NAME: ${self:custom.UsersTable.name}
   iamRoleStatements:
