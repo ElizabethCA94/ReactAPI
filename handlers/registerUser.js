@@ -1,5 +1,8 @@
 "use strict";
-const AWS = require("aws-sdk"); 
+
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
+
 AWS.config.update({
   region: "local",
   endpoint: "http://localhost:8000",
@@ -12,36 +15,37 @@ module.exports.registerUser = async (event, context, callback) => {
   const data = JSON.parse(event.body);
 
   if (!data.email) {
-    callback(new Error("email is required"));
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "email is required" }),
+    });
   }
 
   if (!data.password) {
-    callback(new Error("password is required"));
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "password is required" }),
+    });
   }
 
   const params = {
-    TableName: "LearnFunctions-UsersTable-dev",
+    TableName: process.env.USERS_TABLE_NAME,
     Item: {
+      id: uuidv4(),
       email: data.email,
       password: data.password,
     },
   };
 
-  dbClient.put(params, (error, result) => {
-    // handle potential errors
-    if (error) {
-      console.error(error);
-      callback(new Error("Couldn't create the user item."));
-      return;
-    }
-
-    // create a response
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(params.Item),
-    };
-    callback(null, response);
-  });
+  await dbClient
+    .put(params)
+    .promise()
+    .catch((e) => {
+      callback(null, {
+        statusCode: 500,
+        body: JSON.stringify({ message: `DB: ${e.message}` }),
+      });
+    });
 
   const response = {
     statusCode: 200,
@@ -49,7 +53,4 @@ module.exports.registerUser = async (event, context, callback) => {
   };
 
   return callback(null, response);
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };

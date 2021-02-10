@@ -1,7 +1,6 @@
 "use strict";
 
 const AWS = require("aws-sdk");
-const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({
   region: "local",
@@ -9,10 +8,8 @@ AWS.config.update({
 });
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
-module.exports.createQuiz = async (event, context, callback) => {
-  // const config = AWS.config;
-
-  const { description, functionParams, expectedOutput, userId } = JSON.parse(
+module.exports.updateQuiz = async (event, context, callback) => {
+  const { description, functionParams, expectedOutput, userEmail } = JSON.parse(
     event.body
   );
 
@@ -37,10 +34,10 @@ module.exports.createQuiz = async (event, context, callback) => {
     });
   }
 
-  if (!userId) {
+  if (!userEmail) {
     callback(null, {
       statusCode: 400,
-      body: JSON.stringify({ message: "userId is required" }),
+      body: JSON.stringify({ message: "userEmail is required" }),
     });
   }
 
@@ -49,7 +46,7 @@ module.exports.createQuiz = async (event, context, callback) => {
     description,
     functionParams,
     expectedOutput,
-    userId,
+    userEmail,
   };
 
   const tableParams = {

@@ -44,6 +44,13 @@ functions:
           method: post
           path: /createQuiz
 
+  updateQuiz:
+    handler: handlers/updateQuiz.updateQuiz
+    events:
+      - httpApi:
+          method: post
+          path: /updateQuiz
+
 plugins:
   - serverless-offline
   - serverless-dynamodb-local

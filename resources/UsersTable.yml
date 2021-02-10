@@ -5,9 +5,9 @@ UsersTable:
     BillingMode: PAY_PER_REQUEST
 
     AttributeDefinitions:
-      - AttributeName: email
+      - AttributeName: id
         AttributeType: S
 
     KeySchema:
-      - AttributeName: email
+      - AttributeName: id
         KeyType: HASH

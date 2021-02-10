@@ -7,11 +7,7 @@ QuizTable:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
-      - AttributeName: userEmail
-        AttributeType: S
 
     KeySchema:
       - AttributeName: id
         KeyType: HASH
-      - AttributeName: userEmail
-        KeyType: RANGE
