@@ -1,55 +1,76 @@
 "use strict";
-const AWS = require("aws-sdk"); 
+
+const AWS = require("aws-sdk");
+const { v4: uuidv4 } = require("uuid");
+
 AWS.config.update({
   region: "local",
   endpoint: "http://localhost:8000",
 });
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
-module.exports.registerUser = async (event, context, callback) => {
+module.exports.createQuiz = async (event, context, callback) => {
   // const config = AWS.config;
 
-  const data = JSON.parse(event.body);
+  const { description, functionParams, expectedOutput, userEmail } = JSON.parse(
+    event.body
+  );
 
-  if (!data.email) {
-    callback(new Error("email is required"));
+  if (!description) {
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "description is required" }),
+    });
   }
 
-  if (!data.password) {
-    callback(new Error("password is required"));
+  if (!functionParams) {
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "functionParams is required" }),
+    });
   }
 
-  const params = {
-    TableName: "LearnFunctions-UsersTable-dev",
-    Item: {
-      email: data.email,
-      password: data.password,
-    },
+  if (!expectedOutput) {
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "expectedOutput is required" }),
+    });
+  }
+
+  if (!userEmail) {
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "userEmail is required" }),
+    });
+  }
+
+  const quizData = {
+    id: uuidv4(),
+    description,
+    functionParams,
+    expectedOutput,
+    userEmail,
   };
 
-  dbClient.put(params, (error, result) => {
-    // handle potential errors
-    if (error) {
-      console.error(error);
-      callback(new Error("Couldn't create the user item."));
-      return;
-    }
+  const tableParams = {
+    TableName: process.env.QUIZ_TABLE_NAME,
+    Item: quizData,
+  };
 
-    // create a response
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify(params.Item),
-    };
-    callback(null, response);
-  });
+  await dbClient
+    .put(tableParams)
+    .promise()
+    .catch((e) => {
+      callback(null, {
+        statusCode: 500,
+        body: JSON.stringify({ message: `DB: ${e.message}` }),
+      });
+    });
 
   const response = {
-    statusCode: 200,
-    body: JSON.stringify(data),
+    statusCode: 201,
+    body: JSON.stringify(quizData),
   };
 
   return callback(null, response);
-
-  // Use this code if you don't use the http event with the LAMBDA-PROXY integration
-  // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };
