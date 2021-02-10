@@ -11,13 +11,16 @@ provider:
   httpApi:
     cors: true
   environment:
-    USERS_TABLE_NAME: ${self:custom.UsersTable.name}
+    USERS_TABLE_NAME: ${self:custom.DB.prefix}-UsersTable-${self:provider.stage}
+    QUIZ_TABLE_NAME: ${self:custom.DB.prefix}-QuizTable-${self:provider.stage}
   iamRoleStatements:
     - ${file(iam/UsersTableIAM.yml):UsersTableIAM}
+    - ${file(iam/QuizTableIAM.yml):QuizTableIAM}
 
 resources:
   Resources:
     UsersTable: ${file(resources/UsersTable.yml):UsersTable}
+    QuizTable: ${file(resources/QuizTable.yml):QuizTable}
 
 functions:
   hello:
@@ -54,7 +57,3 @@ custom:
       migrate: true
       inMemory: false
       dbPath: ${env:PWD}/database
-
-  UsersTable:
-    name: !Ref UsersTable
-    arn: !GetAtt UsersTable.Arn
