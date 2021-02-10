@@ -9,53 +9,41 @@ AWS.config.update({
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports.updateQuiz = async (event, context, callback) => {
-  const { description, functionParams, expectedOutput, userEmail } = JSON.parse(
-    event.body
-  );
+  const { quizId, userId, ...bodyData } = JSON.parse(event.body);
 
-  if (!description) {
+  if (!quizId) {
     callback(null, {
       statusCode: 400,
-      body: JSON.stringify({ message: "description is required" }),
+      body: JSON.stringify({ message: "quizId is required" }),
     });
   }
 
-  if (!functionParams) {
-    callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({ message: "functionParams is required" }),
-    });
+  let UpdateExpression = "set ";
+  const ExpressionAttributeNames = {};
+  const ExpressionAttributeValues = {};
+
+  for (const [key, value] of Object.entries(bodyData)) {
+    const keyName = `#${key}`;
+    const keyValue = `:${key}`;
+    UpdateExpression += `${keyName}=${keyValue},`;
+    ExpressionAttributeNames[`${keyName}`] = key;
+    ExpressionAttributeValues[`${keyValue}`] = value;
   }
+  UpdateExpression = UpdateExpression.slice(0, -1);
 
-  if (!expectedOutput) {
-    callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({ message: "expectedOutput is required" }),
-    });
-  }
+  console.log(UpdateExpression);
 
-  if (!userEmail) {
-    callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({ message: "userEmail is required" }),
-    });
-  }
-
-  const quizData = {
-    id: uuidv4(),
-    description,
-    functionParams,
-    expectedOutput,
-    userEmail,
-  };
-
-  const tableParams = {
+  const updateQuizParams = {
     TableName: process.env.QUIZ_TABLE_NAME,
-    Item: quizData,
+    Key: { id: quizId },
+    UpdateExpression,
+    ExpressionAttributeNames,
+    ExpressionAttributeValues,
+    ReturnValues: "ALL_NEW",
   };
 
-  await dbClient
-    .put(tableParams)
+  const result = await dbClient
+    .update(updateQuizParams)
     .promise()
     .catch((e) => {
       callback(null, {
@@ -66,7 +54,7 @@ module.exports.updateQuiz = async (event, context, callback) => {
 
   const response = {
     statusCode: 201,
-    body: JSON.stringify(quizData),
+    body: JSON.stringify(result.Attributes),
   };
 
   return callback(null, response);

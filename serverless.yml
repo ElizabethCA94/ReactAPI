@@ -48,7 +48,7 @@ functions:
     handler: handlers/updateQuiz.updateQuiz
     events:
       - httpApi:
-          method: post
+          method: patch
           path: /updateQuiz
 
 plugins:
