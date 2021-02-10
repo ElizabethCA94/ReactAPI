@@ -42,7 +42,7 @@ functions:
     events:
       - httpApi:
           method: post
-          path: /createQuiz
+          path: /createQuizf
 
   updateQuiz:
     handler: handlers/updateQuiz.updateQuiz
@@ -50,6 +50,13 @@ functions:
       - httpApi:
           method: patch
           path: /updateQuiz
+
+  deleteQuiz:
+    handler: handlers/deleteQuiz.deleteQuiz
+    events:
+      - httpApi:
+          method: delete
+          path: /deleteQuiz
 
 plugins:
   - serverless-offline

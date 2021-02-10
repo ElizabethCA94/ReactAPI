@@ -31,8 +31,6 @@ module.exports.updateQuiz = async (event, context, callback) => {
   }
   UpdateExpression = UpdateExpression.slice(0, -1);
 
-  console.log(UpdateExpression);
-
   const updateQuizParams = {
     TableName: process.env.QUIZ_TABLE_NAME,
     Key: { id: quizId },
