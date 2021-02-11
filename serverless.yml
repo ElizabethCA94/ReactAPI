@@ -48,6 +48,13 @@ functions:
           method: post
           path: /loginUser
 
+  logoutUser:
+    handler: handlers/logoutUser.logoutUser
+    events:
+      - httpApi:
+          method: post
+          path: /logoutUser
+
   # ------------------------------------------------- 
   # + Quiz
   # ------------------------------------------------- 

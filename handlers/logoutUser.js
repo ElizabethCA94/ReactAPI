@@ -9,20 +9,13 @@ AWS.config.update({
 });
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
-module.exports.loginUser = async (event, context, callback) => {
-  const { email, password } = JSON.parse(event.body);
+module.exports.logoutUser = async (event, context, callback) => {
+  const { secretId } = JSON.parse(event.body);
 
-  if (!email) {
+  if (!secretId) {
     callback(null, {
       statusCode: 400,
-      body: JSON.stringify({ message: "email is required" }),
-    });
-  }
-
-  if (!password) {
-    callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({ message: "password is required" }),
+      body: JSON.stringify({ message: "secretId is required" }),
     });
   }
 
@@ -30,16 +23,14 @@ module.exports.loginUser = async (event, context, callback) => {
     .query({
       TableName: process.env.USERS_TABLE_NAME,
       Limit: 1,
-      IndexName: "users-password-email",
+      IndexName: "users-secretId",
       ExpressionAttributeNames: {
-        "#email": "email",
-        "#password": "password",
+        "#secretId": "secretId",
       },
       ExpressionAttributeValues: {
-        ":email": email,
-        ":password": password,
+        ":secretId": secretId,
       },
-      KeyConditionExpression: "#email = :email AND #password = :password",
+      KeyConditionExpression: "#secretId = :secretId",
     })
     .promise();
 
@@ -86,9 +77,11 @@ module.exports.loginUser = async (event, context, callback) => {
       });
     });
 
+  const logoutResonse = { secretId, ...result.Attributes }
+
   const response = {
     statusCode: 200,
-    body: JSON.stringify(result.Attributes),
+    body: JSON.stringify(logoutResonse),
   };
 
   return callback(null, response);

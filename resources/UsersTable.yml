@@ -7,8 +7,8 @@ UsersTable:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
-      # - AttributeName: secretId
-      #   AttributeType: S
+      - AttributeName: secretId
+        AttributeType: S
       - AttributeName: password
         AttributeType: S
       - AttributeName: email
@@ -25,5 +25,12 @@ UsersTable:
             KeyType: HASH
           - AttributeName: email
             KeyType: RANGE
+        Projection:
+          ProjectionType: ALL
+
+      - IndexName: users-secretId
+        KeySchema:
+          - AttributeName: secretId
+            KeyType: HASH
         Projection:
           ProjectionType: ALL
