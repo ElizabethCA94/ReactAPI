@@ -7,7 +7,23 @@ UsersTable:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
+      # - AttributeName: secretId
+      #   AttributeType: S
+      - AttributeName: password
+        AttributeType: S
+      - AttributeName: email
+        AttributeType: S
 
     KeySchema:
       - AttributeName: id
         KeyType: HASH
+
+    GlobalSecondaryIndexes:
+      - IndexName: users-password-email
+        KeySchema:
+          - AttributeName: password
+            KeyType: HASH
+          - AttributeName: email
+            KeyType: RANGE
+        Projection:
+          ProjectionType: ALL

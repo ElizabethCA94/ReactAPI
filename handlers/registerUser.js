@@ -34,6 +34,7 @@ module.exports.registerUser = async (event, context, callback) => {
       id: uuidv4(),
       email: data.email,
       password: data.password,
+      secretId: uuidv4(),
     },
   };
 

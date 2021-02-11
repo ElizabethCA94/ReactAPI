@@ -30,12 +30,27 @@ functions:
           method: get
           path: /hello
 
+  # ------------------------------------------------- 
+  # + User
+  # ------------------------------------------------- 
+
   registerUser:
     handler: handlers/registerUser.registerUser
     events:
       - httpApi:
           method: post
           path: /registerUser
+
+  loginUser:
+    handler: handlers/loginUser.loginUser
+    events:
+      - httpApi:
+          method: post
+          path: /loginUser
+
+  # ------------------------------------------------- 
+  # + Quiz
+  # ------------------------------------------------- 
 
   createQuiz:
     handler: handlers/createQuiz.createQuiz
