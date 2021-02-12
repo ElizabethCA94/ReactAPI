@@ -64,7 +64,7 @@ functions:
     events:
       - httpApi:
           method: post
-          path: /createQuizf
+          path: /createQuiz
 
   updateQuiz:
     handler: handlers/updateQuiz.updateQuiz
