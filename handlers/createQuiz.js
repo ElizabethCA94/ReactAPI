@@ -12,9 +12,12 @@ const dbClient = new AWS.DynamoDB.DocumentClient();
 module.exports.createQuiz = async (event, context, callback) => {
   // const config = AWS.config;
 
-  const { description, functionParams, expectedOutput, userId } = JSON.parse(
-    event.body
-  );
+  const {
+    description,
+    functionParams,
+    expectedOutput,
+    userSecretId,
+  } = JSON.parse(event.body);
 
   if (!description) {
     callback(null, {
@@ -37,19 +40,43 @@ module.exports.createQuiz = async (event, context, callback) => {
     });
   }
 
-  if (!userId) {
+  if (!userSecretId) {
     callback(null, {
       statusCode: 400,
-      body: JSON.stringify({ message: "userId is required" }),
+      body: JSON.stringify({ message: "userSecretId is required" }),
     });
   }
+
+  const findUserResponse = await dbClient
+    .query({
+      TableName: process.env.USERS_TABLE_NAME,
+      Limit: 1,
+      IndexName: "users-secretId",
+      ExpressionAttributeNames: {
+        "#secretId": "secretId",
+      },
+      ExpressionAttributeValues: {
+        ":secretId": userSecretId,
+      },
+      KeyConditionExpression: "#secretId = :secretId",
+    })
+    .promise();
+
+  if (!findUserResponse.Items.length) {
+    callback(null, {
+      statusCode: 401,
+      body: JSON.stringify({ message: "unauthorized" }),
+    });
+  }
+
+  const userDocument = findUserResponse.Items[0];
 
   const quizData = {
     id: uuidv4(),
     description,
     functionParams,
     expectedOutput,
-    userId,
+    userId: userDocument.id,
   };
 
   const tableParams = {

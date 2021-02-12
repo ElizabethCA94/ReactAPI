@@ -88,7 +88,11 @@ module.exports.loginUser = async (event, context, callback) => {
 
   const response = {
     statusCode: 200,
-    body: JSON.stringify(result.Attributes),
+    body: JSON.stringify({
+      id: result.Attributes.id,
+      email: result.Attributes.email,
+      secretId: result.Attributes.secretId,
+    }),
   };
 
   return callback(null, response);
