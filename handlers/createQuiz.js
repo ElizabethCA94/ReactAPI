@@ -10,8 +10,6 @@ AWS.config.update({
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports.createQuiz = async (event, context, callback) => {
-  // const config = AWS.config;
-
   const {
     description,
     functionParams,

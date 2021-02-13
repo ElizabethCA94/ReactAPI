@@ -59,6 +59,13 @@ functions:
   # + Quiz
   # ------------------------------------------------- 
 
+  listQuiz:
+    handler: handlers/listQuiz.listQuiz
+    events:
+      - httpApi:
+          method: post
+          path: /listQuiz
+          
   createQuiz:
     handler: handlers/createQuiz.createQuiz
     events:

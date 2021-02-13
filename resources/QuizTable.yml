@@ -7,7 +7,17 @@ QuizTable:
     AttributeDefinitions:
       - AttributeName: id
         AttributeType: S
+      - AttributeName: userId
+        AttributeType: S
 
     KeySchema:
       - AttributeName: id
         KeyType: HASH
+
+    GlobalSecondaryIndexes:
+      - IndexName: quiz-userId
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        Projection:
+          ProjectionType: ALL
