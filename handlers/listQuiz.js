@@ -10,38 +10,14 @@ AWS.config.update({
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports.listQuiz = async (event, context, callback) => {
-  const { secretId } = JSON.parse(event.body);
+  const { userId } = JSON.parse(event.body);
 
-  if (!secretId) {
+  if (!userId) {
     callback(null, {
       statusCode: 400,
-      body: JSON.stringify({ message: "secretId is required" }),
+      body: JSON.stringify({ message: "userId is required" }),
     });
   }
-
-  const findUserResponse = await dbClient
-    .query({
-      TableName: process.env.USERS_TABLE_NAME,
-      Limit: 1,
-      IndexName: "users-secretId",
-      ExpressionAttributeNames: {
-        "#secretId": "secretId",
-      },
-      ExpressionAttributeValues: {
-        ":secretId": secretId,
-      },
-      KeyConditionExpression: "#secretId = :secretId",
-    })
-    .promise();
-
-  if (!findUserResponse.Items.length) {
-    callback(null, {
-      statusCode: 400,
-      body: JSON.stringify({ message: "user not has quizes" }),
-    });
-  }
-
-  const userDocument = findUserResponse.Items[0];
 
   const findQuizResponse = await dbClient
     .query({
@@ -51,7 +27,7 @@ module.exports.listQuiz = async (event, context, callback) => {
         "#userId": "userId",
       },
       ExpressionAttributeValues: {
-        ":userId": userDocument.id,
+        ":userId": userId,
       },
       KeyConditionExpression: "#userId = :userId",
     })

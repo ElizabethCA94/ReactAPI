@@ -24,7 +24,7 @@ module.exports.createQuiz = async (event, context, callback) => {
     });
   }
 
-  if (!functionParams) {
+  if (functionParams === undefined) {
     callback(null, {
       statusCode: 400,
       body: JSON.stringify({ message: "functionParams is required" }),
