@@ -9,7 +9,7 @@ AWS.config.update({
 const dbClient = new AWS.DynamoDB.DocumentClient();
 
 module.exports.updateQuiz = async (event, context, callback) => {
-  const { quizId, userId, ...bodyData } = JSON.parse(event.body);
+  const { quizId, userSecretId, ...bodyData } = JSON.parse(event.body);
 
   if (!quizId) {
     callback(null, {
@@ -17,6 +17,37 @@ module.exports.updateQuiz = async (event, context, callback) => {
       body: JSON.stringify({ message: "quizId is required" }),
     });
   }
+
+  if (!userSecretId) {
+    callback(null, {
+      statusCode: 400,
+      body: JSON.stringify({ message: "userSecretId is required" }),
+    });
+  }
+
+  const findUserResponse = await dbClient
+    .query({
+      TableName: process.env.USERS_TABLE_NAME,
+      Limit: 1,
+      IndexName: "users-secretId",
+      ExpressionAttributeNames: {
+        "#secretId": "secretId",
+      },
+      ExpressionAttributeValues: {
+        ":secretId": userSecretId,
+      },
+      KeyConditionExpression: "#secretId = :secretId",
+    })
+    .promise();
+
+  if (!findUserResponse.Items.length) {
+    callback(null, {
+      statusCode: 401,
+      body: JSON.stringify({ message: "unauthorized" }),
+    });
+  }
+
+  const userDocument = findUserResponse.Items[0];
 
   let UpdateExpression = "set ";
   const ExpressionAttributeNames = {};
@@ -33,6 +64,7 @@ module.exports.updateQuiz = async (event, context, callback) => {
 
   const updateQuizParams = {
     TableName: process.env.QUIZ_TABLE_NAME,
+    IndexName: "quiz-userId",
     Key: { id: quizId },
     UpdateExpression,
     ExpressionAttributeNames,
