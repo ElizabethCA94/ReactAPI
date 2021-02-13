@@ -64,7 +64,6 @@ module.exports.updateQuiz = async (event, context, callback) => {
 
   const updateQuizParams = {
     TableName: process.env.QUIZ_TABLE_NAME,
-    IndexName: "quiz-userId",
     Key: { id: quizId },
     UpdateExpression,
     ExpressionAttributeNames,

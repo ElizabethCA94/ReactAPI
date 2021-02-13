@@ -77,7 +77,7 @@ functions:
     handler: handlers/updateQuiz.updateQuiz
     events:
       - httpApi:
-          method: patch
+          method: post
           path: /updateQuiz
 
   deleteQuiz:

@@ -17,9 +17,7 @@ QuizTable:
     GlobalSecondaryIndexes:
       - IndexName: quiz-userId
         KeySchema:
-          - AttributeName: id
-            KeyType: HASH
           - AttributeName: userId
-            KeyType: RANGE
+            KeyType: HASH
         Projection:
           ProjectionType: ALL
